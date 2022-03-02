@@ -261,7 +261,7 @@ class AnnotationTool extends Component {
     var identifier = "data";
     if (url.indexOf(identifier) > 0) {
       var file = this._gup(identifier);
-      var data = require('./' + file + '.json');
+      var data = require('./jsons/' + file);
       this.setState({imageData: data}, () => this.setState({
         maxLevels: Object.keys(this.state.imageData).length,
         maxImages: this.state.imageData[0].length,
