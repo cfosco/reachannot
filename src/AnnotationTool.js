@@ -11,7 +11,7 @@ import "react-sweet-progress/lib/style.css";
 import Example1 from './annotationIllustration_interactability.png';
 
 import { Dropbox } from 'dropbox';
-const accessToken = 'k9n1fRo2LjEAAAAAAAAAAXmXzQSKciAEM7-5Z0fjWVXbmPP3szQ-cwReXu2f-Rcn';
+const accessToken = '0_m4r5qdxpQAAAAAAAAAAdAu_PnzOISv1yIJ8PE_EcgTLUnJIawNOKrxtyO3Odo_';
 const dbx = new Dropbox({
   accessToken
 });
@@ -178,9 +178,10 @@ class AnnotationTool extends Component {
       console.log(this.state.buttonText);
     }
 
-    if (this.state.coordinateData.length === 0) {
+    if (this.state.coordinateData.length === 0) {        
+        mainCtx.drawImage(img, 0, 0, this.imageWidth, this.imageHeight)
         this._updateCanvas(markedAreasCtx, img, this.imageWidth*this.sizeFactor, this.imageHeight*this.sizeFactor, this.sizeFactor);   
-        this._updateCanvas(mainCtx, img, this.imageWidth, this.imageHeight);       
+        // this._updateCanvas(mainCtx, img, this.imageWidth, this.imageHeight);       
 
     }
     
@@ -412,6 +413,7 @@ class AnnotationTool extends Component {
       currentIndex: this.state.currentIndex + 1,
       coordinateData: [],
     })
+
   }
 
 
