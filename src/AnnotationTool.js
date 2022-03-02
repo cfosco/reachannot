@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { withStyles, MuiThemeProvider, createTheme } from '@material-ui/core/styles';
 import { Button, Popover, Typography, Radio, FormLabel, FormControlLabel, RadioGroup, FormControl} from '@material-ui/core';
-import imageData from './img_test.json';
+import imageData from './jsons/json_0.json';
 import $ from 'jquery';
 import { Progress } from 'react-sweet-progress';
 import Slider from 'rc-slider';
@@ -11,7 +11,7 @@ import "react-sweet-progress/lib/style.css";
 import Example1 from './annotationIllustration_interactability.png';
 
 import { Dropbox } from 'dropbox';
-const accessToken = 'TBD';
+const accessToken = 'k9n1fRo2LjEAAAAAAAAAAXmXzQSKciAEM7-5Z0fjWVXbmPP3szQ-cwReXu2f-Rcn';
 const dbx = new Dropbox({
   accessToken
 });
@@ -338,6 +338,18 @@ class AnnotationTool extends Component {
     if (this.state.buttonText === "NEXT LEVEL") {
       this._loadNextLevel();
     } else if (this.state.buttonText === "SUBMIT") {
+
+      // Handle Dropbox submit
+      var myJSON = JSON.stringify(this.state.data);
+      dbx.filesUpload({path: '/' + this._makeid(20) + '.json', contents: myJSON})
+      //  .then(function(response) {
+      //    alert("Thank you for completing the game.");
+      //  })
+       .catch(function(error) {
+         console.log("error: ", error);
+       });
+
+      // Handle Mturk Submit
       this._submitHITform();
     }
   }
