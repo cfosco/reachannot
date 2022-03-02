@@ -10,11 +10,11 @@ import 'rc-slider/assets/index.css';
 import "react-sweet-progress/lib/style.css";
 import Example1 from './annotationIllustration_interactability.png';
 
-// import { Dropbox } from 'dropbox';
-// const accessToken = 'R8MlER2022sAAAAAAAAAAeAjhJAqaBrMcjUe3EOrJLfcvEXpIQm7PeAigVqKM0hy';
-// const dbx = new Dropbox({
-//   accessToken
-// });
+import { Dropbox } from 'dropbox';
+const accessToken = 'TBD';
+const dbx = new Dropbox({
+  accessToken
+});
 
 const MTURK_SUBMIT_SUFFIX = "/mturk/externalSubmit";
 
