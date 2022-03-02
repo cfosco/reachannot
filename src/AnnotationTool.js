@@ -364,18 +364,14 @@ class AnnotationTool extends Component {
     this._addHiddenField(form, 'assignmentId', this._gup("assignmentId"));
     this._addHiddenField(form, 'workerId', this._gup("workerId"));
     this._addHiddenField(form, 'taskTime', (Date.now() - this.state.timer)/1000);
-    this._addHiddenField(form, 'feedback', $("#feedback-input").val());
-
-    // var results = {
-    //     'outputs': this.state.data,
-    // };
+    // this._addHiddenField(form, 'feedback', $("#feedback-input").val());
 
     console.log("Submitting the following data:", this.state.data);
 
-    // this._addHiddenField(form, 'results', JSON.stringify(this.state.data));
-    // $("#submit-form").attr("action", submitUrl);
-    // $("#submit-form").attr("method", "POST");
-    // $("#submit-form").submit();
+    this._addHiddenField(form, 'results', JSON.stringify(this.state.data));
+    $("#submit-form").attr("action", submitUrl);
+    $("#submit-form").attr("method", "POST");
+    $("#submit-form").submit();
   }
 
   _gup(name) {
