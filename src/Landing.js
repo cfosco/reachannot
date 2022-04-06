@@ -55,31 +55,31 @@ export default function Landing(props) {
   return (
     <div className={classes.root}>
       <div className={classes.topContainer}>
-        <Typography variant="h3" style={{marginBottom: 16}}>
-          Annotation Tool - Reachability Experiment
+        <Typography variant="h4" style={{marginBottom: 16}}>
+          Interacting in Reachable Spaces
         </Typography>
 
         {/* ////// Task Intro */}
         <Typography variant="subtitle1" align="left">
           <h3>Instructions</h3>
-                In this experiment, you will be asked to annotate parts of reachable environments, to indicate how someone might interact with them.
-                < br/>
-                
+                In this experiment, you will be asked to annotate the interactable objects in pictures of reachable environments. Specifically, you will use a paintbrush tool to indicate <strong> any object, button, switch, or item that you can use or manipulate when performing an action.</strong>
+                < br/>< br/>
+
+                There are two different annotations to use:                 
                 <ul>
-                <li>First, please indicate ALL objects or elements that someone could interact with their hands. Imagine the picture is someone's viewpoint - what are all the components that they could act on from that position?
+                <li> Use the first color to indicate the subset of objects you are MOST LIKELY to interact with. This could be one object or many, but it should be the subset of objects that you would probably be using if you were experiencing the view in the picture.
                 </li>
-                <li>
-                Next, indicate only the subset of objects or elements that are most likely to be interacted with. Ask yourself: in a standard interaction, what subset of objects would I focus my actions on?
+                <li> Use the second color to indicate ALL of the remaining objects or components that it is possible to interact with.
                 </li>
                 </ul>
 
-                Sometimes it might be hard to choose which annotations to use, or you may not be familiar with the environment in the photo, but just make your best guess.
+                After using both annotations, you should have painted over every object or component that a person could interact with. Sometimes it might be hard to choose which annotations to use, or you may not be familiar with the environment in the photo, but just make your best guess.
+                < br/>
+                < br/>
                 < br/>
 
           <b>Here is an Example:</b>
         </Typography>
-        <br/>
-        <br/>
 
         <div className={classes.gifContainer}>
           <img src={ImgEx1} width="80%" style={{marginRight: 16}} />
@@ -104,7 +104,7 @@ export default function Landing(props) {
           Here are some things to keep in mind: 
 
           <ul>
-          <li>There may be some overlap in the two annotations, that is ok.
+          <li>Try to reduce the overlap in the two annotations.
           </li>
           <li>
           When adding the annotations, make sure to consider any element that could be relevant to the activity you would perform in the space, including buttons or knobs, not just objects.

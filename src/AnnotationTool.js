@@ -107,6 +107,18 @@ const styles = theme => ({
     flexDirection: "row",
     justifyContent: "center",
   },
+    demoSurveySection: {
+  	width: "70%",
+    textAlign: "center",
+    padding: 16,
+    display: "none",
+  },
+  ejectorPage: {
+  	width: "70%",
+    textAlign: "center",
+    padding: 16,
+    display: "none",
+  },
 });
 
 const THEME = createTheme({
@@ -161,6 +173,11 @@ class AnnotationTool extends Component {
     this._submitHITform = this._submitHITform.bind(this);
     this._updateCanvas = this._updateCanvas.bind(this);
     this._clearCanvasAnnotations = this._clearCanvasAnnotations.bind(this);
+    
+    this.onChangeAge = this.onChangeAge.bind(this);
+    this.onChangeGender = this.onChangeGender.bind(this);
+    this.onChangeRace = this.onChangeRace.bind(this);
+    this.onChangeEthn = this.onChangeEthn.bind(this);
   }
 
   componentDidMount() {
@@ -182,9 +199,7 @@ class AnnotationTool extends Component {
         mainCtx.drawImage(img, 0, 0, this.imageWidth, this.imageHeight)
         this._updateCanvas(markedAreasCtx, img, this.imageWidth*this.sizeFactor, this.imageHeight*this.sizeFactor, this.sizeFactor);   
         // this._updateCanvas(mainCtx, img, this.imageWidth, this.imageHeight);       
-
     }
-    
 
     mainCanvas.addEventListener('click', () => {
       clearInterval(this.interval);
@@ -443,6 +458,19 @@ class AnnotationTool extends Component {
     }
     return result;
   }
+  
+  onChangeAge(event) {
+  	console.log(event.target.value);
+  }
+  onChangeGender(event) {
+  	console.log(event.target.value);
+  }
+  onChangeRace(event) {
+  	console.log(event.target.value);
+  }
+  onChangeEthn(event) {
+  	console.log(event.target.value);
+  }
 
   render() {
     const { classes } = this.props;
@@ -602,9 +630,6 @@ class AnnotationTool extends Component {
             <Button disabled={!disabled} variant="contained" className={classes.startButton} onClick={this._handleNextButton}>
               NEXT
             </Button>
-            <Button disabled={disabled} variant="contained" className={classes.startButton} onClick={this._handleSubmitButton}>
-              {buttonText}
-            </Button>
           </div>
           <Typography>
             You must mark the image before being able to click 'Next'.
@@ -614,6 +639,59 @@ class AnnotationTool extends Component {
           <Typography className={classes.irb} variant="caption">
             This HIT is part of a MIT scientific research project. Your decision to complete this HIT is voluntary. There is no way for us to identify you. The only information we will have, in addition to your responses, is the time at which you completed the study. The results of the research may be presented at scientific meetings or published in scientific journals. Clicking on the 'SUBMIT' button on the bottom of this page indicates that you are at least 18 years of age and agree to complete this HIT voluntarily.
           </Typography>
+          
+          <div className={classes.demoSurveySection}>
+          	<Typography variant="h4">
+            	Thanks for participating
+            </Typography>
+            < br/>< br/>
+            <Typography>
+            	If this is your first time completing the HIT, please fill out the demographic survey below. Otherwise, click SUBMIT to finish
+            </Typography>
+            < br/>< br/> 
+            <div onChange={this.onChangeAge}>
+				Please enter your <strong>age</strong> < br/>
+				<input name="age" type="text" id="age"/>
+            </div>< br/>< br/> 
+            <div onChange={this.onChangeGender}>
+				Please select your <strong>gender</strong> < br/>
+				<input name="gender" type="radio" value="male" /> Male 
+				<input name="gender" type="radio" value="female" /> Female 
+				<input name="gender" type="radio" value="NB" /> Nonbinary
+				<input name="gender" type="radio" value="notReported" checked /> Not Reported
+      		</div>< br/>< br/>
+      		<div onChange={this.onChangeRace}>
+				Please select your <strong>race</strong> < br/>
+				<input name="race" type="radio" value="AIAN" /> American Indian or Alaska Native
+				 <input name="race" type="radio" value="Asian" /> Asian 
+				 <input name="race" type="radio" value="BlackAA" /> Black or African-American 
+				 <input name="race" type="radio" value="NHPI" /> Native Hawaiian/ Pacific Islander 
+				 <input name="race" type="radio" value="White" /> White 
+				 <input name="race" type="radio" value="MixedRace" /> More than one race 
+				 <input name="race" type="radio" value="notReported" checked /> Not Reported
+      		</div>
+      		< br/>< br/>
+      		<div onChange={this.onChangeEthn}>
+      			Please select your <strong>ethnicity</strong> < br/>
+				<input name="ethnicity" type="radio" value="hispanicLatino" /> Hispanic or Latino 
+				<input name="ethnicity" type="radio" value="notHispanicLatino" /> Not Hispanic or Latino
+				<input name="ethnicity" type="radio" value="notReported" checked /> Not Reported
+      		</div>
+      		< br/>< br/>
+            <Button disabled={disabled} variant="contained" className={classes.startButton} onClick={this._handleSubmitButton}>
+              {buttonText}
+            </Button>
+          </div>
+          
+          <div className={classes.ejectorPage}>
+			< br/>< br/>< br/>
+			<Typography variant="h4">
+				We have detected anomalies in your responses < br/>< br/>
+				It appears that you are not performing the HIT according to our instructions < br/>< br/>
+				Please return the HIT	
+			</Typography>	
+		  </div>
+		  
         </div>
       </MuiThemeProvider>
     );
