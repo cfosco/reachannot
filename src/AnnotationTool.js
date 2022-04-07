@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { withStyles, MuiThemeProvider, createTheme } from '@material-ui/core/styles';
 import { Button, Popover, Typography, Radio, FormLabel, FormControlLabel, RadioGroup, FormControl} from '@material-ui/core';
-import imageData from './jsons/json_0.json';
+import imageData from './img_test.json';
 import $ from 'jquery';
 import { Progress } from 'react-sweet-progress';
 import Slider from 'rc-slider';
@@ -111,13 +111,13 @@ const styles = theme => ({
   	width: "70%",
     textAlign: "center",
     padding: 16,
-    display: "none",
+    // display: "none",
   },
   ejectorPage: {
   	width: "70%",
     textAlign: "center",
     padding: 16,
-    display: "none",
+    // display: "none",
   },
 });
 
@@ -153,7 +153,9 @@ class AnnotationTool extends Component {
       timer: Date.now(),
       imageData: imageData,
       mouseDown: false,
-      brushType: 0  // 0 = reachable, 1 = most likely to be reached
+      brushType: 0,  // 0 = reachable, 1 = most likely to be reached,
+      showDemographics: false,
+      showEjector: false
     };
 
     this.markedCanvasRef = React.createRef();
@@ -164,6 +166,7 @@ class AnnotationTool extends Component {
     this.imageWidth = 600
     this.imageHeight = 400
     this.sizeFactor = 0.7
+    this.state.data.demographics = {}
 
     this._handleClick = this._handleClick.bind(this);
     this._handleClose = this._handleClose.bind(this);
@@ -173,6 +176,7 @@ class AnnotationTool extends Component {
     this._submitHITform = this._submitHITform.bind(this);
     this._updateCanvas = this._updateCanvas.bind(this);
     this._clearCanvasAnnotations = this._clearCanvasAnnotations.bind(this);
+    this._handleNextLevelButton = this._handleNextLevelButton.bind(this);
     
     this.onChangeAge = this.onChangeAge.bind(this);
     this.onChangeGender = this.onChangeGender.bind(this);
@@ -289,7 +293,9 @@ class AnnotationTool extends Component {
 
   _updateCanvas(ctx, img, w=600, h=400, scale=1) {
     ctx.drawImage(img, 0, 0, w, h)
-    for (let j = 0; j < this.state.coordinateData.length; j++) {
+    var max_points = 1000
+    var step = Math.ceil(this.state.coordinateData.length / max_points)
+    for (let j = 0; j < this.state.coordinateData.length; j+=step) {
       var [x1, y1, brushType, brushSize] = this.state.coordinateData[j];
       var [r, g, b] = this.colors[brushType];
       ctx.beginPath();
@@ -339,7 +345,7 @@ class AnnotationTool extends Component {
       alert("You have not marked the image yet. Please do so before continuing");
       return;
     } else if (this.state.coordinateData.length < 10) {
-      alert("The image was not properly marked. Please perform the task properly.");
+      alert("The image was not properly marked. Please perform the task correctly.");
       return;
     }
     clearInterval(this.interval);
@@ -348,12 +354,18 @@ class AnnotationTool extends Component {
     }, () => this._loadNextImage());
   }
 
+  _handleNextLevelButton() {
+    this._loadNextLevel();
+  }
+
   _handleSubmitButton() {
     clearInterval(this.interval);
 
-    if (this.state.buttonText === "NEXT LEVEL") {
-      this._loadNextLevel();
-    } else if (this.state.buttonText === "SUBMIT") {
+    // if (this.state.buttonText === "NEXT LEVEL") {
+    //   this._loadNextLevel();
+    // } else if (this.state.buttonText === "SUBMIT") {
+
+      console.log(this.state.data);
 
       // Handle Dropbox submit
       var myJSON = JSON.stringify(this.state.data);
@@ -367,7 +379,7 @@ class AnnotationTool extends Component {
 
       // Handle Mturk Submit
       this._submitHITform();
-    }
+    // }
   }
 
   _submitHITform() {
@@ -415,7 +427,7 @@ class AnnotationTool extends Component {
     if (this.state.percent === 100) {
       this.setState({disabled: false})
       if (this.state.currentLevel >= this.state.maxLevels - 1) {
-        this.setState({buttonText: 'SUBMIT'})
+        this.setState({showDemographics: true})
         return;
       }
       return;
@@ -460,28 +472,33 @@ class AnnotationTool extends Component {
   }
   
   onChangeAge(event) {
-  	console.log(event.target.value);
+  	console.log(this.state.data.demographics);
+    this.state.data.demographics["age"] = event.target.value;
   }
   onChangeGender(event) {
   	console.log(event.target.value);
+    this.state.data.demographics["gender"] = event.target.value;
   }
   onChangeRace(event) {
   	console.log(event.target.value);
+    this.state.data.demographics["race"] = event.target.value;
   }
   onChangeEthn(event) {
   	console.log(event.target.value);
+    this.state.data.demographics["ethnicity"] = event.target.value;
   }
 
   render() {
     const { classes } = this.props;
     const { buttonText, disabled, imageData,
             percent, currentLevel, currentIndex,
-            maxLevels, anchorEl, brushSize } = this.state;
+            maxLevels, anchorEl, brushSize, showDemographics, showEjector } = this.state;
     const open = Boolean(anchorEl);
     const id = open ? 'simple-popover' : undefined;
     return (
       <MuiThemeProvider theme={THEME}>
         <div className={classes.root}>
+          {!showDemographics && <div>
           <div className={classes.topSection}>
             <Typography variant="h2" style={{marginBottom: 16}}>
                 Annotation Tool - Reachability Experiment
@@ -568,8 +585,9 @@ class AnnotationTool extends Component {
               />
             </div>
           </div>
+
           <div className={classes.imageSection}>
-            
+
             {/* ##### MAIN IMAGE SECTION ##### */}
             <div className={classes.mainImageSection}>
               <Typography variant="h5">
@@ -630,6 +648,9 @@ class AnnotationTool extends Component {
             <Button disabled={!disabled} variant="contained" className={classes.startButton} onClick={this._handleNextButton}>
               NEXT
             </Button>
+            <Button disabled={disabled} variant="contained" className={classes.startButton} onClick={this._handleNextLevelButton}>
+              NEXT LEVEL
+            </Button>
           </div>
           <Typography>
             You must mark the image before being able to click 'Next'.
@@ -639,8 +660,10 @@ class AnnotationTool extends Component {
           <Typography className={classes.irb} variant="caption">
             This HIT is part of a MIT scientific research project. Your decision to complete this HIT is voluntary. There is no way for us to identify you. The only information we will have, in addition to your responses, is the time at which you completed the study. The results of the research may be presented at scientific meetings or published in scientific journals. Clicking on the 'SUBMIT' button on the bottom of this page indicates that you are at least 18 years of age and agree to complete this HIT voluntarily.
           </Typography>
+
+        </div>}
           
-          <div className={classes.demoSurveySection}>
+          {showDemographics && <div className={classes.demoSurveySection}>
           	<Typography variant="h4">
             	Thanks for participating
             </Typography>
@@ -649,48 +672,55 @@ class AnnotationTool extends Component {
             	If this is your first time completing the HIT, please fill out the demographic survey below. Otherwise, click SUBMIT to finish
             </Typography>
             < br/>< br/> 
+
             <div onChange={this.onChangeAge}>
-				Please enter your <strong>age</strong> < br/>
-				<input name="age" type="text" id="age"/>
-            </div>< br/>< br/> 
+              Please enter your <strong>age</strong> < br/>
+              <input name="age" type="text" id="age"/>
+            </div>
+            < br/>< br/> 
+            
             <div onChange={this.onChangeGender}>
-				Please select your <strong>gender</strong> < br/>
-				<input name="gender" type="radio" value="male" /> Male 
-				<input name="gender" type="radio" value="female" /> Female 
-				<input name="gender" type="radio" value="NB" /> Nonbinary
-				<input name="gender" type="radio" value="notReported" checked /> Not Reported
-      		</div>< br/>< br/>
-      		<div onChange={this.onChangeRace}>
-				Please select your <strong>race</strong> < br/>
-				<input name="race" type="radio" value="AIAN" /> American Indian or Alaska Native
-				 <input name="race" type="radio" value="Asian" /> Asian 
-				 <input name="race" type="radio" value="BlackAA" /> Black or African-American 
-				 <input name="race" type="radio" value="NHPI" /> Native Hawaiian/ Pacific Islander 
-				 <input name="race" type="radio" value="White" /> White 
-				 <input name="race" type="radio" value="MixedRace" /> More than one race 
-				 <input name="race" type="radio" value="notReported" checked /> Not Reported
-      		</div>
-      		< br/>< br/>
-      		<div onChange={this.onChangeEthn}>
-      			Please select your <strong>ethnicity</strong> < br/>
-				<input name="ethnicity" type="radio" value="hispanicLatino" /> Hispanic or Latino 
-				<input name="ethnicity" type="radio" value="notHispanicLatino" /> Not Hispanic or Latino
-				<input name="ethnicity" type="radio" value="notReported" checked /> Not Reported
-      		</div>
-      		< br/>< br/>
+              Please select your <strong>gender</strong> < br/>
+              <input name="gender" type="radio" value="male" /> Male 
+              <input name="gender" type="radio" value="female" /> Female 
+              <input name="gender" type="radio" value="NB" /> Nonbinary
+              <input name="gender" type="radio" value="notReported" checked /> Not Reported
+            </div>
+            < br/>< br/>
+            
+            <div onChange={this.onChangeRace}>
+              Please select your <strong>race</strong> < br/>
+              <input name="race" type="radio" value="AIAN" /> American Indian or Alaska Native
+              <input name="race" type="radio" value="Asian" /> Asian 
+              <input name="race" type="radio" value="BlackAA" /> Black or African-American 
+              <input name="race" type="radio" value="NHPI" /> Native Hawaiian/ Pacific Islander 
+              <input name="race" type="radio" value="White" /> White 
+              <input name="race" type="radio" value="MixedRace" /> More than one race 
+              <input name="race" type="radio" value="notReported" checked /> Not Reported
+            </div>
+            < br/>< br/>
+
+            <div onChange={this.onChangeEthn}>
+              Please select your <strong>ethnicity</strong> < br/>
+              <input name="ethnicity" type="radio" value="hispanicLatino" /> Hispanic or Latino 
+              <input name="ethnicity" type="radio" value="notHispanicLatino" /> Not Hispanic or Latino
+              <input name="ethnicity" type="radio" value="notReported" checked /> Not Reported
+            </div>
+            < br/>< br/>
+
             <Button disabled={disabled} variant="contained" className={classes.startButton} onClick={this._handleSubmitButton}>
-              {buttonText}
+              SUBMIT
             </Button>
-          </div>
+          </div>}
           
-          <div className={classes.ejectorPage}>
-			< br/>< br/>< br/>
-			<Typography variant="h4">
-				We have detected anomalies in your responses < br/>< br/>
-				It appears that you are not performing the HIT according to our instructions < br/>< br/>
-				Please return the HIT	
-			</Typography>	
-		  </div>
+        {showEjector && <div className={classes.ejectorPage}>
+          < br/>< br/>< br/>
+          <Typography variant="h4">
+            We have detected anomalies in your responses < br/>< br/>
+            It appears that you are not performing the HIT according to our instructions < br/>< br/>
+            Please return the HIT	
+          </Typography>	
+        </div>}
 		  
         </div>
       </MuiThemeProvider>
