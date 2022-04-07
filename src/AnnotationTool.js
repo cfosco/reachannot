@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { withStyles, MuiThemeProvider, createTheme } from '@material-ui/core/styles';
 import { Button, Popover, Typography, Radio, FormLabel, FormControlLabel, RadioGroup, FormControl} from '@material-ui/core';
-import imageData from './img_test.json';
+import imageData from './jsons/json_0.json';
 import $ from 'jquery';
 import { Progress } from 'react-sweet-progress';
 import Slider from 'rc-slider';
