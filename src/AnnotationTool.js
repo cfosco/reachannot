@@ -609,21 +609,21 @@ class AnnotationTool extends Component {
                   <Typography variant="subtitle1">
                     Adjust Brush Size ({brushSize} px):
                   </Typography>
-                  <Slider style={{marginTop: 12}} min={3} max={24} defaultValue={brushSize} handle={handle}
+                  <Slider style={{marginTop: 12}} min={10} max={50} defaultValue={brushSize} handle={handle}
                       onChange={(val) => this.setState({brushSize: val})} />
                       {/* <Box sx={{ p: brushSize, border: '3px solid black' }}/> */}
                 </div>
 
-                <FormControl style={{marginTop: 12, marginLeft: 15, width: "40%"}}>
-                  <FormLabel id="demo-radio-buttons-group-label" >Annotation type</FormLabel>
+                <FormControl style={{marginTop: 12, marginLeft: 15, width: "50%"}}>
+                  <FormLabel id="demo-radio-buttons-group-label" >From this position, what are the:</FormLabel>
                   <RadioGroup
                     aria-labelledby="demo-radio-buttons-group-label"
                     defaultValue="reachable"
                     name="radio-buttons-group"
                     onChange={(e) => this.setState({brushType: e.target.value === "reachable" ? "0" : "1"})}
                   >
-                    <FormControlLabel value="reachable" control={<Radio color="grey"/>} label="Reachable" />
-                    <FormControlLabel value="most_likely_reachable" control={<Radio color="grey"/>}  label="Most likely to be interacted with" />
+                    <FormControlLabel value="reachable" control={<Radio color="grey"/>} label="1-5 objects you are MOST LIKELY to interact with." />
+                    <FormControlLabel value="most_likely_reachable" control={<Radio color="grey"/>}  label="All other objects it is possible to interact with." />
                   </RadioGroup>
                 </FormControl>
               </div>
