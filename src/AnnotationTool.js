@@ -343,6 +343,12 @@ class AnnotationTool extends Component {
   };
 
   _handleNextButton() {
+    if (this.state.coordinateData.length === 0 && this.state.currentIndex > 0){
+      this.setState({showEjector: true})
+      // alert("PLEASE RETURN THE HIT");
+//       return;
+    }
+    
     if (this.state.coordinateData.length === 0) {
       alert("You have not marked the image yet. Please do so before continuing");
       return;
@@ -500,7 +506,7 @@ class AnnotationTool extends Component {
     return (
       <MuiThemeProvider theme={THEME}>
         <div className={classes.root}>
-          {!showDemographics && <div>
+          {!showDemographics && !showEjector && <div>
           <div className={classes.topSection}>
             <Typography variant="h2" style={{marginBottom: 16}}>
                 Annotation Tool - Reachability Experiment
@@ -556,10 +562,9 @@ class AnnotationTool extends Component {
                       </li>
                       </ul>
                 </Typography>
-
               </div>
-              
             </Popover>
+            
             {maxLevels>1 && 
             <Typography variant="h5" style={{marginTop: 32, marginBottom: 12}}>
               Current Level: {currentLevel + 1} / {maxLevels}
