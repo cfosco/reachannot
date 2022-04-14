@@ -142,11 +142,13 @@ class AnnotationTool extends Component {
       anchorEl: null,
       brushSize: 20,
       buttonText: "SUBMIT",
+      nextButtonText: "NEXT",
       coordinateData: [],
       currentLevel: 0,
       currentIndex: 0,
       data: {},
-      disabled: true,
+      nextDisabled: false,
+      submitDisabled: true,
       maxLevels: Object.keys(imageData).length,
       maxImages: imageData[0].length,
       mousedownStart: [],
@@ -157,12 +159,14 @@ class AnnotationTool extends Component {
       mouseDown: false,
       brushType: 0,  // 0 = reachable, 1 = most likely to be reached,
       showDemographics: false,
-      showEjector: false
+      showEjector: false,
+      timeBeforeEnablingNext: 8000, // TIME IN EACH TRIAL BEFORE NEXT BUTTON IS ENABLED
     };
 
     this.markedCanvasRef = React.createRef();
     this.mainCanvasRef = React.createRef();
     this.imageRef = React.createRef();
+    this.nextButtonRef = React.createRef();
 
     this.colors = [[0, 255, 0], [255, 0, 0]]
     this.imageWidth = 600
@@ -170,6 +174,7 @@ class AnnotationTool extends Component {
     this.sizeFactor = 0.7
     this.state.data.demographics = {}
 
+  
     this._handleClick = this._handleClick.bind(this);
     this._handleClose = this._handleClose.bind(this);
     this._handleNextButton = this._handleNextButton.bind(this);
@@ -194,18 +199,33 @@ class AnnotationTool extends Component {
     const mainCtx = mainCanvas.getContext("2d");
     const img = this.imageRef.current;
 
+    const nextButton = this.nextButtonRef.current;
+
     var i;
 
     if (this.state.maxLevels > 1) {
       this.state.buttonText = "NEXT LEVEL";
-      console.log(this.state.buttonText);
     }
 
     if (this.state.coordinateData.length === 0) {        
         mainCtx.drawImage(img, 0, 0, this.imageWidth, this.imageHeight)
         this._updateCanvas(markedAreasCtx, img, this.imageWidth*this.sizeFactor, this.imageHeight*this.sizeFactor, this.sizeFactor);   
-        // this._updateCanvas(mainCtx, img, this.imageWidth, this.imageHeight);       
     }
+
+
+    nextButton.addEventListener('click', () => {
+      console.log("NEXT CLICKED")
+      setTimeout(() => {
+        // mainCtx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
+
+      // Show the outline of the brush while moving on the Canvas
+
+        if (!this.state.mouseDown) {
+          mainCtx.drawImage(img, 0, 0, this.imageWidth, this.imageHeight)
+        }
+        mainCtx.fill();
+      });
+    });
 
     mainCanvas.addEventListener('click', () => {
       clearInterval(this.interval);
@@ -218,6 +238,9 @@ class AnnotationTool extends Component {
     }, false);
 
     mainCanvas.addEventListener('mousemove', (e) => {
+
+        console.log("Mousemove")
+
         // clearInterval(this.interval);
         setTimeout(() => {
           // mainCtx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
@@ -237,6 +260,7 @@ class AnnotationTool extends Component {
         mainCanvas.onmouseleave = () => {        
           this.state.mouseDown = false;
           mainCanvas.onmousemove = null;
+          console.log("mouseleave in mousemove")
           mainCtx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
           mainCtx.drawImage(img, 0, 0, this.imageWidth, this.imageHeight)
         }
@@ -244,6 +268,7 @@ class AnnotationTool extends Component {
     }, false)
 
     mainCanvas.addEventListener("mousedown", (e) => {
+      console.log("Mouse down")
       clearInterval(this.interval);
       this.state.mouseDown = true;
 
@@ -294,6 +319,8 @@ class AnnotationTool extends Component {
   componentDidUpdate(){}
 
   _updateCanvas(ctx, img, w=600, h=400, scale=1) {
+    // console.log("updating canvas")
+    // console.log(img)
     ctx.drawImage(img, 0, 0, w, h)
     var max_points = 1000
     var step = Math.ceil(this.state.coordinateData.length / max_points)
@@ -343,10 +370,8 @@ class AnnotationTool extends Component {
   };
 
   _handleNextButton() {
-    if (this.state.coordinateData.length === 0 && this.state.currentIndex > 0){
+    if (this.state.coordinateData.length === 0 && this.state.currentIndex > 0 && this.state.currentIndex < this.state.maxImages*2/3) {
       this.setState({showEjector: true})
-      // alert("PLEASE RETURN THE HIT");
-//       return;
     }
     
     if (this.state.coordinateData.length === 0) {
@@ -391,7 +416,7 @@ class AnnotationTool extends Component {
   }
 
   _submitHITform() {
-    this.setState({disabled: true, overclick: true});
+    this.setState({submitDisabled: true, overclick: true});
     var submitUrl = decodeURIComponent(this._gup("turkSubmitTo")) + MTURK_SUBMIT_SUFFIX;
     var form = $("#submit-form");
 
@@ -427,13 +452,33 @@ class AnnotationTool extends Component {
 
   _loadNextImage() {
 
+    this.setState({nextButtonText: "Move mouse over image to mark it"});
+
+    this.setState({nextDisabled: true});
+    setTimeout(() => {
+      console.log("timeout")
+      this.setState({nextButtonText: "NEXT"});
+      this.setState({nextDisabled: false});
+      }, this.state.timeBeforeEnablingNext);
+
+
     var key = this.state.currentIndex;
     var imageURL = this.state.imageData[this.state.currentLevel][this.state.currentIndex];
     this.state.data[imageURL] = this.state.coordinateData;
     // this.state.data[key] = {[imageURL]: this.state.coordinateData};
-
+    
+    // Draw the image once to avoid lag
+    // const img = this.imageRef.current
+    // img.onload() = function(){
+    //   const mainCanvas = this.mainCanvasRef.current;
+    //   const mainCtx = mainCanvas.getContext("2d");
+    //   console.log("Drawing image");
+    //   mainCtx.drawImage(this.imageRef.current, 0, 0, this.imageWidth, this.imageHeight);
+    //   console.log("Image drawn");
+    // }
+    
     if (this.state.percent === 100) {
-      this.setState({disabled: false})
+      this.setState({submitDisabled: false})
       if (this.state.currentLevel >= this.state.maxLevels - 1) {
         this.setState({showDemographics: true})
         return;
@@ -453,7 +498,7 @@ class AnnotationTool extends Component {
       currentLevel: this.state.currentLevel + 1,
       percent: 0,
       currentIndex: 0,
-      disabled: true,
+      submitDisabled: true,
       coordinateData: [],
     })
   }
@@ -498,7 +543,7 @@ class AnnotationTool extends Component {
 
   render() {
     const { classes } = this.props;
-    const { buttonText, disabled, imageData,
+    const { buttonText, nextDisabled, submitDisabled, imageData, nextButtonText,
             percent, currentLevel, currentIndex,
             maxLevels, anchorEl, brushSize, showDemographics, showEjector } = this.state;
     const open = Boolean(anchorEl);
@@ -620,6 +665,7 @@ class AnnotationTool extends Component {
 
                 <FormControl style={{marginTop: 12, marginLeft: 15, width: "50%"}}>
                   <FormLabel id="demo-radio-buttons-group-label" >From this position, what are the:</FormLabel>
+                  <br/>
                   <RadioGroup
                     aria-labelledby="demo-radio-buttons-group-label"
                     defaultValue="0"
@@ -649,8 +695,8 @@ class AnnotationTool extends Component {
           </div>
 
           <div style={{display: 'flex', flexDirection: 'row'}}>
-            <Button disabled={!disabled} variant="contained" className={classes.startButton} onClick={this._handleNextButton} style={{margin: 'auto'}}>
-              NEXT
+            <Button ref={this.nextButtonRef} disabled={nextDisabled} variant="contained" className={classes.startButton} onClick={this._handleNextButton} style={{margin: 'auto'}}>
+              {nextButtonText}
             </Button>
           </div>< br/>
           <Typography>
@@ -710,7 +756,7 @@ class AnnotationTool extends Component {
             </div>
             < br/>< br/>
 
-            <Button disabled={disabled} variant="contained" className={classes.startButton} onClick={this._handleSubmitButton}>
+            <Button disabled={submitDisabled} variant="contained" className={classes.startButton} onClick={this._handleSubmitButton}>
               SUBMIT
             </Button>
           </div>}
