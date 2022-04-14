@@ -157,7 +157,7 @@ class AnnotationTool extends Component {
       timer: Date.now(),
       imageData: imageData,
       mouseDown: false,
-      brushType: 0,  // 0 = reachable, 1 = most likely to be reached,
+      brushType: 0,  // 0 = most likely to be reached, 1 = reachable 
       showDemographics: false,
       showEjector: false,
       timeBeforeEnablingNext: 8000, // TIME IN EACH TRIAL BEFORE NEXT BUTTON IS ENABLED
@@ -212,36 +212,26 @@ class AnnotationTool extends Component {
         this._updateCanvas(markedAreasCtx, img, this.imageWidth*this.sizeFactor, this.imageHeight*this.sizeFactor, this.sizeFactor);   
     }
 
+    // img.onloadeddata = () => {
+    //     mainCtx.drawImage(img, 0, 0, this.imageWidth, this.imageHeight)
+    //     this._updateCanvas(markedAreasCtx, img, this.imageWidth*this.sizeFactor, this.imageHeight*this.sizeFactor, this.sizeFactor);
+    // }
 
-    nextButton.addEventListener('click', () => {
-      console.log("NEXT CLICKED")
-      setTimeout(() => {
-        // mainCtx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
-
-      // Show the outline of the brush while moving on the Canvas
-
-        if (!this.state.mouseDown) {
-          mainCtx.drawImage(img, 0, 0, this.imageWidth, this.imageHeight)
-        }
-        mainCtx.fill();
-      });
-    });
 
     mainCanvas.addEventListener('click', () => {
       clearInterval(this.interval);
+
       i = window.setInterval(() => {
 
         this._updateCanvas(markedAreasCtx, img, this.imageWidth*this.sizeFactor, this.imageHeight*this.sizeFactor, this.sizeFactor);   
-        // this._updateCanvas(mainCtx, img, this.imageWidth, this.imageHeight);       
-
+        // this._updateCanvas(mainCtx, img, this.imageWidth, this.imageHeight);  
+        
       }, 20)
     }, false);
 
     mainCanvas.addEventListener('mousemove', (e) => {
 
-        console.log("Mousemove")
-
-        // clearInterval(this.interval);
+        clearInterval(this.interval);
         setTimeout(() => {
           // mainCtx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
 
@@ -268,7 +258,6 @@ class AnnotationTool extends Component {
     }, false)
 
     mainCanvas.addEventListener("mousedown", (e) => {
-      console.log("Mouse down")
       clearInterval(this.interval);
       this.state.mouseDown = true;
 
@@ -289,8 +278,8 @@ class AnnotationTool extends Component {
         });
       }
       mainCanvas.onmouseleave = () => {
-        // mainCtx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
-        // mainCtx.drawImage(img, 0, 0, this.imageWidth, this.imageHeight)
+        mainCtx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
+        mainCtx.drawImage(img, 0, 0, this.imageWidth, this.imageHeight)
         this.state.mouseDown = false;
         mainCanvas.onmousemove = null;
       }
@@ -322,7 +311,7 @@ class AnnotationTool extends Component {
     // console.log("updating canvas")
     // console.log(img)
     ctx.drawImage(img, 0, 0, w, h)
-    var max_points = 1000
+    var max_points = 500
     var step = Math.ceil(this.state.coordinateData.length / max_points)
     for (let j = 0; j < this.state.coordinateData.length; j+=step) {
       var [x1, y1, brushType, brushSize] = this.state.coordinateData[j];
@@ -332,6 +321,13 @@ class AnnotationTool extends Component {
       ctx.fillStyle="rgb(" + r + ", " + g + ", " + b + ", 0.5)";
       ctx.fill();
     }
+  }
+
+  _updateMainCanvas(ctx, img, w=600, h=400, scale=1) {
+    // draw image
+    ctx.drawImage(img, 0, 0, w, h)
+
+    // draw current 
   }
 
 
@@ -374,14 +370,37 @@ class AnnotationTool extends Component {
       this.setState({showEjector: true})
     }
     
+
     if (this.state.coordinateData.length === 0) {
       alert("You have not marked the image yet. Please do so before continuing");
       return;
     } else if (this.state.coordinateData.length < 10) {
       alert("The image was not properly marked. Please perform the task correctly.");
       return;
+    } else {
+      // Check if coordinateData has elements with both brushTypes
+      console.log(this.state.coordinateData)
+      var hasType1 = false;
+      var hasType2 = false;
+      for (let i=0, len=this.state.coordinateData.length; i<len; i++) {
+        if (this.state.coordinateData[i][2] === 0) {
+          hasType1 = true;
+        }
+        else if (this.state.coordinateData[i][2] === 1) {
+          hasType2 = true;
+        }
+      }
+  
+      if (!hasType1) {
+        alert("The image was not properly marked. You have no annotations for the '1-5 objects you are most likely to interact with'.");
+        return;
+      }
+      else if (!hasType2) {
+        alert("The image was not properly marked. You have no annotations for 'all other objects it is possible to interact with'.");
+        return;
+      }
     }
-    clearInterval(this.interval);
+
     this.setState({
       percent: this.state.percent + 100/this.state.maxImages,
     }, () => this._loadNextImage());
@@ -468,15 +487,14 @@ class AnnotationTool extends Component {
     // this.state.data[key] = {[imageURL]: this.state.coordinateData};
     
     // Draw the image once to avoid lag
-    // const img = this.imageRef.current
-    // img.onload() = function(){
-    //   const mainCanvas = this.mainCanvasRef.current;
-    //   const mainCtx = mainCanvas.getContext("2d");
-    //   console.log("Drawing image");
-    //   mainCtx.drawImage(this.imageRef.current, 0, 0, this.imageWidth, this.imageHeight);
-    //   console.log("Image drawn");
-    // }
-    
+    const img = this.imageRef.current
+
+    const mainCanvas = this.mainCanvasRef.current;
+    const mainCtx = mainCanvas.getContext("2d");
+    img.onloadeddata = () => {
+      console.log("Drawing image");
+      mainCtx.drawImage(img, 0, 0, this.imageWidth, this.imageHeight)
+  }
     if (this.state.percent === 100) {
       this.setState({submitDisabled: false})
       if (this.state.currentLevel >= this.state.maxLevels - 1) {
@@ -668,12 +686,14 @@ class AnnotationTool extends Component {
                   <br/>
                   <RadioGroup
                     aria-labelledby="demo-radio-buttons-group-label"
-                    defaultValue="0"
+                    defaultValue="most_likely_reachable"
                     name="radio-buttons-group"
-                    onChange={(e) => this.setState({brushType: e.target.value === "reachable" ? "0" : "1"})}
+                    onChange={(e) => this.setState({brushType: e.target.value === "most_likely_reachable" ? 0 : 1})}
                   >
-                    <FormControlLabel value="reachable" control={<Radio color="grey"/>} label="1-5 objects you are MOST LIKELY to interact with." />
-                    <FormControlLabel value="most_likely_reachable" control={<Radio color="grey"/>}  label="All other objects it is possible to interact with." />
+                    <FormControlLabel value="most_likely_reachable" 
+                        control={<Radio color="primary" />} 
+                        label="1-5 objects you are MOST LIKELY to interact with." />
+                    <FormControlLabel value="reachable" control={<Radio color="secondary"/>}  label="All other objects it is possible to interact with." />
                   </RadioGroup>
                 </FormControl>
               </div>
