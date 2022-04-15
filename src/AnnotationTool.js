@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { withStyles, MuiThemeProvider, createTheme } from '@material-ui/core/styles';
 import { Button, Popover, Typography, Radio, FormLabel, FormControlLabel, RadioGroup, FormControl} from '@material-ui/core';
-import imageData from './jsons/json_0.json';
+// import imageData from './jsons/json_0.json';
+import imageData from './img_test.json';
 import $ from 'jquery';
 import { Progress } from 'react-sweet-progress';
 import Slider from 'rc-slider';
@@ -160,7 +161,7 @@ class AnnotationTool extends Component {
       brushType: 0,  // 0 = most likely to be reached, 1 = reachable 
       showDemographics: false,
       showEjector: false,
-      timeBeforeEnablingNext: 8000, // TIME IN EACH TRIAL BEFORE NEXT BUTTON IS ENABLED
+      timeBeforeEnablingNext: 10000, // TIME IN EACH TRIAL BEFORE NEXT BUTTON IS ENABLED
     };
 
     this.markedCanvasRef = React.createRef();
@@ -391,14 +392,14 @@ class AnnotationTool extends Component {
         }
       }
   
-      if (!hasType1) {
-        alert("The image was not properly marked. You have no annotations for the '1-5 objects you are most likely to interact with'.");
-        return;
-      }
-      else if (!hasType2) {
-        alert("The image was not properly marked. You have no annotations for 'all other objects it is possible to interact with'.");
-        return;
-      }
+//       if (!hasType1) {
+//         alert("The image was not properly marked. You have no annotations for the '1-5 objects you are most likely to interact with'.");
+//         return;
+//       }
+//       else if (!hasType2) {
+//         alert("The image was not properly marked. You have no annotations for 'all other objects it is possible to interact with'.");
+//         return;
+//       }
     }
 
     this.setState({
@@ -471,7 +472,7 @@ class AnnotationTool extends Component {
 
   _loadNextImage() {
 
-    this.setState({nextButtonText: "Move mouse over image to mark it"});
+    this.setState({nextButtonText: "Move mouse over image to start"});
 
     this.setState({nextDisabled: true});
     setTimeout(() => {
@@ -572,7 +573,7 @@ class AnnotationTool extends Component {
           {!showDemographics && !showEjector && <div>
           <div className={classes.topSection}>
             <Typography variant="h2" style={{marginBottom: 16}}>
-                Annotation Tool - Reachability Experiment
+                Interacting in Reachable Spaces
             </Typography>
             <Button id="instruction-button" variant="contained" color="primary" onClick={this._handleClick}>Instructions</Button>
             <Popover
@@ -598,13 +599,13 @@ class AnnotationTool extends Component {
                       < br/>
                       
                       <ul>
-                      <li>Use the first color to indicate the subset of objects you are MOST LIKELY to interact with. This could be one object or many, but it should be the subset of objects that you would probably be using if you were experiencing the view in the picture.
+                      <li> Use the first color to indicate the subset of objects you are VERY LIKELY to interact with. This could be one object or many, but it should be the subset of objects that you would probably be using the most if you were experiencing the view in the picture.
                       </li>
-                      <li> Use the second color to indicate ALL of the remaining objects or components that it is possible to interact with.
+                      <li> Use the second color to indicate ALL of the remaining objects or components that it is possible to interact with. 
                       </li>
                       </ul>
 
-                      Sometimes it might be hard to choose which annotations to use, or you may not be familiar with the environment in the photo, but just make your best guess.
+                      Sometimes it might be hard to choose which annotations to use, or you may not be familiar with the environment in the photo, but just make your best guess. 
                       < br/>
                       < br/>
                 <div className={classes.gifContainer}>
@@ -616,12 +617,13 @@ class AnnotationTool extends Component {
                       <ul>
                       <li> Try to reduce the overlap in the two annotations.
                       </li>
+                      <li> You do not need to use both annotations on every image.
+                      </li>
                       <li> When adding the annotations, make sure to consider any element that could be relevant to the activity you would perform in the space, including buttons or knobs, not just objects.
                       </li>
                       <li> There is no time limit per image.
                       </li>
-                      <li>
-                      If there are watermarks on the image, please ignore them while making your annotation.
+                      <li> If there are watermarks on the image, please ignore them while making your annotation.
                       </li>
                       </ul>
                 </Typography>
@@ -658,7 +660,7 @@ class AnnotationTool extends Component {
             {/* ##### MAIN IMAGE SECTION ##### */}
             <div className={classes.mainImageSection}>
               <Typography variant="h5">
-                Paint over the objects/components that you could physically interact with from this position
+                Paint over the objects/components that you could physically interact with in this space
               </Typography>
               <br/>
               <canvas id="myCanvas" ref={this.mainCanvasRef} width={this.imageWidth} height={this.imageHeight} />
@@ -682,7 +684,7 @@ class AnnotationTool extends Component {
                 </div>
 
                 <FormControl style={{marginTop: 12, marginLeft: 15, width: "50%"}}>
-                  <FormLabel id="demo-radio-buttons-group-label" >From this position, what are the:</FormLabel>
+                  <FormLabel id="demo-radio-buttons-group-label" > In this environment, indicate:</FormLabel>
                   <br/>
                   <RadioGroup
                     aria-labelledby="demo-radio-buttons-group-label"
@@ -692,8 +694,10 @@ class AnnotationTool extends Component {
                   >
                     <FormControlLabel value="most_likely_reachable" 
                         control={<Radio color="primary" />} 
-                        label="1-5 objects you are MOST LIKELY to interact with." />
-                    <FormControlLabel value="reachable" control={<Radio color="secondary"/>}  label="All other objects it is possible to interact with." />
+                        label="Any component you are VERY LIKELY to interact with" />
+                    <FormControlLabel value="reachable" 
+                    	control={<Radio color="secondary"/>}  
+                    	label="ALL other components it is possible to interact with." />
                   </RadioGroup>
                 </FormControl>
               </div>
@@ -752,7 +756,7 @@ class AnnotationTool extends Component {
               <input name="gender" type="radio" value="male" /> Male 
               <input name="gender" type="radio" value="female" /> Female 
               <input name="gender" type="radio" value="NB" /> Nonbinary
-              <input name="gender" type="radio" value="notReported" checked /> Not Reported
+              <input name="gender" type="radio" value="notReported" /> Not Reported
             </div>
             < br/>< br/>
             
@@ -764,7 +768,7 @@ class AnnotationTool extends Component {
               <input name="race" type="radio" value="NHPI" /> Native Hawaiian/ Pacific Islander 
               <input name="race" type="radio" value="White" /> White 
               <input name="race" type="radio" value="MixedRace" /> More than one race 
-              <input name="race" type="radio" value="notReported" checked /> Not Reported
+              <input name="race" type="radio" value="notReported" /> Not Reported
             </div>
             < br/>< br/>
 
@@ -772,7 +776,7 @@ class AnnotationTool extends Component {
               Please select your <strong>ethnicity</strong> < br/>
               <input name="ethnicity" type="radio" value="hispanicLatino" /> Hispanic or Latino 
               <input name="ethnicity" type="radio" value="notHispanicLatino" /> Not Hispanic or Latino
-              <input name="ethnicity" type="radio" value="notReported" checked /> Not Reported
+              <input name="ethnicity" type="radio" value="notReported" /> Not Reported
             </div>
             < br/>< br/>
 

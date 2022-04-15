@@ -67,7 +67,7 @@ export default function Landing(props) {
 
                 There are two different annotations to use:                 
                 <ul>
-                <li> Use the first color to indicate the subset of objects you are MOST LIKELY to interact with. This could be one object or many, but it should be the subset of objects that you would probably be using if you were experiencing the view in the picture.
+                <li> Use the first color to indicate the subset of objects you are VERY LIKELY to interact with. This could be one object or many, but it should be the subset of objects that you would probably be using the most if you were experiencing the view in the picture.
                 </li>
                 <li> Use the second color to indicate ALL of the remaining objects or components that it is possible to interact with.
                 </li>
@@ -106,6 +106,8 @@ export default function Landing(props) {
           <ul>
           <li>Try to reduce the overlap in the two annotations.
           </li>
+          <li> You do not need to use both annotations on every image.
+		  </li>
           <li>
           When adding the annotations, make sure to consider any element that could be relevant to the activity you would perform in the space, including buttons or knobs, not just objects.
           </li>
