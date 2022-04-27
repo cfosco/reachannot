@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "af10a4b708fb2a59e53ee69c04fd0add",
+    "revision": "8f3c88c59662286b06be511278b0f421",
     "url": "/reachannot/index.html"
   },
   {
@@ -8,7 +8,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/reachannot/static/css/2.399453d7.chunk.css"
   },
   {
-    "revision": "753adda56e48f6a5c273",
+    "revision": "46f933dd146373843358",
     "url": "/reachannot/static/css/main.1dd51469.chunk.css"
   },
   {
@@ -20,8 +20,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/reachannot/static/js/2.7bec7614.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "753adda56e48f6a5c273",
-    "url": "/reachannot/static/js/main.642acf29.chunk.js"
+    "revision": "46f933dd146373843358",
+    "url": "/reachannot/static/js/main.1e0f3a43.chunk.js"
   },
   {
     "revision": "a20cd26a4109ddd74cb2",
@@ -36,8 +36,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/reachannot/static/media/annotationIllustration_interactability.0fa8f762.png"
   },
   {
-    "revision": "19bfc913e22d86646111ca02b17c8b44",
-    "url": "/reachannot/static/media/guidelines.19bfc913.png"
+    "revision": "1ae992ef5be0425b317add2f87f3c32e",
+    "url": "/reachannot/static/media/guidelines.1ae992ef.png"
   },
   {
     "revision": "877dc11ccfea3e4f9a6f23585de25862",
