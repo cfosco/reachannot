@@ -440,7 +440,7 @@ class AnnotationTool extends Component {
   }
 
   _submitHITform() {
-    this.setState({submitDisabled: false, overclick: true});
+    this.setState({submitDisabled: true, overclick: true});
     var submitUrl = decodeURIComponent(this._gup("turkSubmitTo")) + MTURK_SUBMIT_SUFFIX;
     var form = $("#submit-form");
 
@@ -757,30 +757,30 @@ class AnnotationTool extends Component {
             
             <div onChange={this.onChangeGender}>
               Please select your <strong>gender</strong> < br/>
-              <input name="gender" type="radio" value="male" /> Male 
-              <input name="gender" type="radio" value="female" /> Female 
-              <input name="gender" type="radio" value="NB" /> Nonbinary
-              <input name="gender" type="radio" value="notReported" /> Not Reported
+              <input name="gender" type="radio" value="male" /> Male       
+              <input name="gender" type="radio" value="female" /> Female       
+              <input name="gender" type="radio" value="NB" /> Nonbinary      
+              <input name="gender" type="radio" value="notReported" /> Not Reported      
             </div>
             < br/>< br/>
             
             <div onChange={this.onChangeRace}>
               Please select your <strong>race</strong> < br/>
-              <input name="race" type="radio" value="AIAN" /> American Indian or Alaska Native
-              <input name="race" type="radio" value="Asian" /> Asian 
-              <input name="race" type="radio" value="BlackAA" /> Black or African-American 
-              <input name="race" type="radio" value="NHPI" /> Native Hawaiian/ Pacific Islander 
-              <input name="race" type="radio" value="White" /> White 
-              <input name="race" type="radio" value="MixedRace" /> More than one race 
-              <input name="race" type="radio" value="notReported" /> Not Reported
+              <input name="race" type="radio" value="AIAN" /> American Indian or Alaska Native      
+              <input name="race" type="radio" value="Asian" /> Asian       
+              <input name="race" type="radio" value="BlackAA" /> Black or African-American       
+              <input name="race" type="radio" value="NHPI" /> Native Hawaiian/ Pacific Islander       
+              <input name="race" type="radio" value="White" /> White       
+              <input name="race" type="radio" value="MixedRace" /> More than one race       
+              <input name="race" type="radio" value="notReported" /> Not Reported      
             </div>
             < br/>< br/>
 
             <div onChange={this.onChangeEthn}>
               Please select your <strong>ethnicity</strong> < br/>
-              <input name="ethnicity" type="radio" value="hispanicLatino" /> Hispanic or Latino 
-              <input name="ethnicity" type="radio" value="notHispanicLatino" /> Not Hispanic or Latino
-              <input name="ethnicity" type="radio" value="notReported" /> Not Reported
+              <input name="ethnicity" type="radio" value="hispanicLatino" /> Hispanic or Latino       
+              <input name="ethnicity" type="radio" value="notHispanicLatino" /> Not Hispanic or Latino      
+              <input name="ethnicity" type="radio" value="notReported" /> Not Reported      
             </div>
             < br/>< br/>
 
