@@ -161,6 +161,7 @@ class AnnotationTool extends Component {
       showDemographics: false,
       showEjector: false,
       timeBeforeEnablingNext: 10000, // TIME IN EACH TRIAL BEFORE NEXT BUTTON IS ENABLED
+      mistakeCtr: 0, // how mant times have they tried to move on without painting?
     };
 
     this.markedCanvasRef = React.createRef();
@@ -367,10 +368,14 @@ class AnnotationTool extends Component {
 
   _handleNextButton() {
     if (this.state.coordinateData.length === 0 && this.state.currentIndex > 0 && this.state.currentIndex < this.state.maxImages*2/3) {
-      this.setState({showEjector: true})
+		console.log(this.state.mistakeCtr+1)
+		this.state.mistakeCtr = this.state.mistakeCtr+1
     }
     
-
+    if (this.state.mistakeCtr === 3) {
+		this.setState({showEjector: true})
+    }
+    
     if (this.state.coordinateData.length === 0) {
       alert("You have not marked the image yet. Please do so before continuing");
       return;
@@ -379,18 +384,18 @@ class AnnotationTool extends Component {
       return;
     } else {
       // Check if coordinateData has elements with both brushTypes
-      console.log(this.state.coordinateData)
-      var hasType1 = false;
-      var hasType2 = false;
-      for (let i=0, len=this.state.coordinateData.length; i<len; i++) {
-        if (this.state.coordinateData[i][2] === 0) {
-          hasType1 = true;
-        }
-        else if (this.state.coordinateData[i][2] === 1) {
-          hasType2 = true;
-        }
-      }
-  
+//       console.log(this.state.coordinateData)
+//       var hasType1 = false;
+//       var hasType2 = false;
+//       for (let i=0, len=this.state.coordinateData.length; i<len; i++) {
+//         if (this.state.coordinateData[i][2] === 0) {
+//           hasType1 = true;
+//         }
+//         else if (this.state.coordinateData[i][2] === 1) {
+//           hasType2 = true;
+//         }
+//       }
+//   
 //       if (!hasType1) {
 //         alert("The image was not properly marked. You have no annotations for the '1-5 objects you are most likely to interact with'.");
 //         return;
@@ -683,7 +688,7 @@ class AnnotationTool extends Component {
                 </div>
 
                 <FormControl style={{marginTop: 12, marginLeft: 15, width: "50%"}}>
-                  <FormLabel id="demo-radio-buttons-group-label" > In this environment, indicate:</FormLabel>
+                  <FormLabel id="demo-radio-buttons-group-label" > If this was your point of view, please indicate:</FormLabel>
                   <br/>
                   <RadioGroup
                     aria-labelledby="demo-radio-buttons-group-label"
@@ -693,7 +698,7 @@ class AnnotationTool extends Component {
                   >
                     <FormControlLabel value="most_likely_reachable" 
                         control={<Radio color="primary" />} 
-                        label="Any component you are VERY LIKELY to interact with" />
+                        label="Any object/component you are VERY LIKELY to interact with" />
                     <FormControlLabel value="reachable" 
                     	control={<Radio color="secondary"/>}  
                     	label="ALL other components it is possible to interact with." />
