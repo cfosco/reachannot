@@ -440,7 +440,7 @@ class AnnotationTool extends Component {
   }
 
   _submitHITform() {
-    this.setState({submitDisabled: true, overclick: true});
+    this.setState({submitDisabled: false, overclick: true});
     var submitUrl = decodeURIComponent(this._gup("turkSubmitTo")) + MTURK_SUBMIT_SUFFIX;
     var form = $("#submit-form");
 
