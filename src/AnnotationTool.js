@@ -16,15 +16,14 @@ const dbx = new Dropbox({
   accessToken
 });
 
-// const MTURK_SUBMIT_SUFFIX = "/mturk/externalSubmit";
+const MTURK_SUBMIT_SUFFIX = "/mturk/externalSubmit";
 
-// get params from Prolific
-// XXX
 const currURL = window.location.search;
 const urlParams = new URLSearchParams(currURL);
 const subject_id = urlParams.get('PROLIFIC_PID');
 const study_id = urlParams.get('STUDY_ID');
 const session_id = urlParams.get('SESSION_ID');
+console.log('12')
 console.log(subject_id)
 console.log(study_id)
 console.log(session_id)
