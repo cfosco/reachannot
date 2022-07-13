@@ -23,7 +23,7 @@ const urlParams = new URLSearchParams(currURL);
 const subject_id = urlParams.get('PROLIFIC_PID');
 const study_id = urlParams.get('STUDY_ID');
 const session_id = urlParams.get('SESSION_ID');
-console.log('12')
+console.log('your song')
 console.log(subject_id)
 console.log(study_id)
 console.log(session_id)
@@ -170,7 +170,7 @@ class AnnotationTool extends Component {
       brushType: 0,  // 0 = most likely to be reached, 1 = reachable 
       showDemographics: false,
       showEjector: false,
-      timeBeforeEnablingNext: 10000, // TIME IN EACH TRIAL BEFORE NEXT BUTTON IS ENABLED
+      timeBeforeEnablingNext: 10000, // TIME IN EACH TRIAL BEFORE NEXT BUTTON IS ENABLED, usually 10000
       mistakeCtr: 0, // how mant times have they tried to move on without painting?
     };
 
@@ -184,14 +184,16 @@ class AnnotationTool extends Component {
     this.imageHeight = 400
     this.sizeFactor = 0.7
     this.state.data.demographics = {}
-
+    
+    this.state.data.subject_id = subject_id
+    this.state.data.study_id = study_id
+    this.state.data.session_id = session_id
   
     this._handleClick = this._handleClick.bind(this);
     this._handleClose = this._handleClose.bind(this);
     this._handleNextButton = this._handleNextButton.bind(this);
     this._handleSubmitButton = this._handleSubmitButton.bind(this);
     this._loadNextImage = this._loadNextImage.bind(this);
-    this._submitHITform = this._submitHITform.bind(this);
     this._updateCanvas = this._updateCanvas.bind(this);
     this._clearCanvasAnnotations = this._clearCanvasAnnotations.bind(this);
     this._handleNextLevelButton = this._handleNextLevelButton.bind(this);
@@ -227,7 +229,6 @@ class AnnotationTool extends Component {
     //     mainCtx.drawImage(img, 0, 0, this.imageWidth, this.imageHeight)
     //     this._updateCanvas(markedAreasCtx, img, this.imageWidth*this.sizeFactor, this.imageHeight*this.sizeFactor, this.sizeFactor);
     // }
-
 
     mainCanvas.addEventListener('click', () => {
       clearInterval(this.interval);
@@ -307,6 +308,11 @@ class AnnotationTool extends Component {
     var identifier = "data";
     if (url.indexOf(identifier) > 0) {
       var file = this._gup(identifier);
+      //need this because of weird prolific sandbox formatting
+      if (file.includes('?PROLIFIC_PID')){
+    		var idx = file.indexOf('?')
+    		file = file.substring(0,idx)
+      }
       var data = require('./jsons/' + file);
       this.setState({imageData: data}, () => this.setState({
         maxLevels: Object.keys(this.state.imageData).length,
@@ -322,7 +328,7 @@ class AnnotationTool extends Component {
     // console.log("updating canvas")
     // console.log(img)
     ctx.drawImage(img, 0, 0, w, h)
-    var max_points = 500
+    var max_points = 450
     var step = Math.ceil(this.state.coordinateData.length / max_points)
     for (let j = 0; j < this.state.coordinateData.length; j+=step) {
       var [x1, y1, brushType, brushSize] = this.state.coordinateData[j];
@@ -340,7 +346,6 @@ class AnnotationTool extends Component {
 
     // draw current 
   }
-
 
   _clearCanvasAnnotations(ctx, img, w=600, h=400) {
     ctx.drawImage(img, 0, 0, w, h)
@@ -428,45 +433,20 @@ class AnnotationTool extends Component {
   _handleSubmitButton() {
     clearInterval(this.interval);
 
-    // if (this.state.buttonText === "NEXT LEVEL") {
-    //   this._loadNextLevel();
-    // } else if (this.state.buttonText === "SUBMIT") {
-
       console.log(this.state.data);
-
-      // Handle Dropbox submit
-      var myJSON = JSON.stringify(this.state.data);
-      dbx.filesUpload({path: '/' + this._makeid(20) + '.json', contents: myJSON})
-      //  .then(function(response) {
-      //    alert("Thank you for completing the game.");
-      //  })
+       
+		var myJSON = JSON.stringify(this.state.data);
+//         dbx.filesUpload({path: '/' + this._makeid(20) + '.json', contents: myJSON})
+		dbx.filesUpload({path: '/' + this.state.data.subject_id + '_' + this.state.data.session_id + '.json', contents: myJSON})
+       .then(function(response) {
+         // redirect
+      		window.location.href = "https://app.prolific.co/submissions/complete?cc=42FA8357";  // XXX
+       }) // XXX
        .catch(function(error) {
          console.log("error: ", error);
        });
-
-      // Handle Mturk Submit
-      this._submitHITform();
-    // }
   }
 
-  _submitHITform() {
-    this.setState({submitDisabled: true, overclick: true});
-    var submitUrl = decodeURIComponent(this._gup("turkSubmitTo")) + MTURK_SUBMIT_SUFFIX;
-    var form = $("#submit-form");
-
-    console.log("Gup output for assignmentId, workerId:", this._gup("assignmentId"),this._gup("workerId"))
-    this._addHiddenField(form, 'assignmentId', this._gup("assignmentId"));
-    this._addHiddenField(form, 'workerId', this._gup("workerId"));
-    this._addHiddenField(form, 'taskTime', (Date.now() - this.state.timer)/1000);
-    // this._addHiddenField(form, 'feedback', $("#feedback-input").val());
-
-    console.log("Submitting the following data:", this.state.data);
-
-    this._addHiddenField(form, 'results', JSON.stringify(this.state.data));
-    $("#submit-form").attr("action", submitUrl);
-    $("#submit-form").attr("method", "POST");
-    $("#submit-form").submit();
-  }
 
   _gup(name) {
     var regexS = "[\\?&]" + name + "=([^&#]*)";
@@ -536,26 +516,16 @@ class AnnotationTool extends Component {
     })
   }
 
-  // _handlePlayButton() {
-  //   const vid = this.imageRef.current;
-  //   if (vid.paused) {
-  //     this.setState({pause: false});
-  //     vid.play();
-  //   } else {
-  //     this.setState({pause: true});
-  //     vid.pause();
-  //   }
-  // }
 
-  _makeid(length) {
-    var result = '';
-    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    var charactersLength = characters.length;
-    for (var i = 0; i < length; i++) {
-       result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-    return result;
-  }
+//   _makeid(length) {
+//     var result = '';
+//     var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+//     var charactersLength = characters.length;
+//     for (var i = 0; i < length; i++) {
+//        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+//     }
+//     return result;
+//   }
   
   onChangeAge(event) {
     console.log(this.state.data.demographics);
@@ -613,9 +583,9 @@ class AnnotationTool extends Component {
                       < br/>
                       
                       <ul>
-                      <li> Use the first color to indicate the subset of objects you are VERY LIKELY to interact with. This could be one object or many, but it should be the subset of objects that you would probably be using the most if you were experiencing the view in the picture.
+                      <li> Use the first color to indicate the subset of objects that were probably actively being used right before the photo was taken.
                       </li>
-                      <li> Use the second color to indicate ALL of the remaining objects or components that it is possible to interact with. 
+                      <li> Use the second color to indicate ALL of the remaining objects, which were not actively being used (like decorations or objects that were placed out of the way). 
                       </li>
                       </ul>
 
@@ -708,10 +678,10 @@ class AnnotationTool extends Component {
                   >
                     <FormControlLabel value="most_likely_reachable" 
                         control={<Radio color="primary" />} 
-                        label="Any object/component you are VERY LIKELY to interact with" />
+                        label="Any object that was probably actively engaged with" />
                     <FormControlLabel value="reachable" 
                     	control={<Radio color="secondary"/>}  
-                    	label="ALL other components it is possible to interact with." />
+                    	label="ALL objects that were not being actively used (like decorations or objects that were placed out of the way)" />
                   </RadioGroup>
                 </FormControl>
               </div>
@@ -795,7 +765,7 @@ class AnnotationTool extends Component {
             < br/>< br/>
 
             <Button disabled={submitDisabled} variant="contained" className={classes.startButton} onClick={this._handleSubmitButton}>
-              SUBMIT
+              SUBMIT and return to Prolific
             </Button>
           </div>}
           
