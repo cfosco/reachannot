@@ -11,6 +11,7 @@ import "react-sweet-progress/lib/style.css";
 import Example1 from './annotationIllustration_interactability.png';
 
 import { Dropbox } from 'dropbox';
+// const accessToken = 'sl.BO0BN17alXUXoQXzzzz01vNiFAzoKAR604h5grOwXTTV1b2454BWrIX1tmgWRyzp7C61PyicZloso3ObyR_zTd8RCcnP06PK4IcqCi4itCbqQdGfE2qkaTr7aQgP1ehjVsSy1_8';
 const accessToken = '0_m4r5qdxpQAAAAAAAAAAdAu_PnzOISv1yIJ8PE_EcgTLUnJIawNOKrxtyO3Odo_';
 const dbx = new Dropbox({
   accessToken
@@ -23,7 +24,6 @@ const urlParams = new URLSearchParams(currURL);
 const subject_id = urlParams.get('PROLIFIC_PID');
 const study_id = urlParams.get('STUDY_ID');
 const session_id = urlParams.get('SESSION_ID');
-console.log('your song')
 console.log(subject_id)
 console.log(study_id)
 console.log(session_id)
@@ -170,8 +170,8 @@ class AnnotationTool extends Component {
       brushType: 0,  // 0 = most likely to be reached, 1 = reachable 
       showDemographics: false,
       showEjector: false,
-      timeBeforeEnablingNext: 10000, // TIME IN EACH TRIAL BEFORE NEXT BUTTON IS ENABLED, usually 10000
-      mistakeCtr: 0, // how mant times have they tried to move on without painting?
+      timeBeforeEnablingNext: 800, // TIME IN EACH TRIAL BEFORE NEXT BUTTON IS ENABLED, usually 8000
+      mistakeCtr: 0, // how many times have they tried to move on without painting?
     };
 
     this.markedCanvasRef = React.createRef();
@@ -325,7 +325,6 @@ class AnnotationTool extends Component {
   componentDidUpdate(){}
 
   _updateCanvas(ctx, img, w=600, h=400, scale=1) {
-    // console.log("updating canvas")
     // console.log(img)
     ctx.drawImage(img, 0, 0, w, h)
     var max_points = 450
@@ -382,6 +381,10 @@ class AnnotationTool extends Component {
   };
 
   _handleNextButton() {
+    console.log(this.state.maxImages)
+    console.log(this.state.maxLevels)
+    console.log(this.state.currentLevel)
+    console.log(this.state.percent)
     if (this.state.coordinateData.length === 0 && this.state.currentIndex > 0 && this.state.currentIndex < this.state.maxImages*2/3) {
 		console.log(this.state.mistakeCtr+1)
 		this.state.mistakeCtr = this.state.mistakeCtr+1
@@ -424,6 +427,7 @@ class AnnotationTool extends Component {
     this.setState({
       percent: this.state.percent + 100/this.state.maxImages,
     }, () => this._loadNextImage());
+    console.log(this.state.percent)
   }
 
   _handleNextLevelButton() {
@@ -436,17 +440,15 @@ class AnnotationTool extends Component {
       console.log(this.state.data);
        
 		var myJSON = JSON.stringify(this.state.data);
-//         dbx.filesUpload({path: '/' + this._makeid(20) + '.json', contents: myJSON})
-		dbx.filesUpload({path: '/' + this.state.data.subject_id + '_' + this.state.data.session_id + '.json', contents: myJSON})
-       .then(function(response) {
-         // redirect
-      		window.location.href = "https://app.prolific.co/submissions/complete?cc=42FA8357";  // XXX
-       }) // XXX
+    dbx.filesUpload({path: '/' + this._makeid(20) + '.json', contents: myJSON})
+      //  .then(function(response) {
+      //    // redirect
+      // 		window.location.href = "https://app.prolific.co/submissions/complete?cc=42FA8357";  // XXX
+      //  }) // XXX
        .catch(function(error) {
          console.log("error: ", error);
        });
   }
-
 
   _gup(name) {
     var regexS = "[\\?&]" + name + "=([^&#]*)";
@@ -490,7 +492,7 @@ class AnnotationTool extends Component {
       console.log("Drawing image");
       mainCtx.drawImage(img, 0, 0, this.imageWidth, this.imageHeight)
   }
-    if (this.state.percent === 100) {
+    if (this.state.percent >= 100) {
       this.setState({submitDisabled: false})
       if (this.state.currentLevel >= this.state.maxLevels - 1) {
         this.setState({showDemographics: true})
@@ -505,7 +507,6 @@ class AnnotationTool extends Component {
 
   }
 
-
   _loadNextLevel() {
     this.setState({
       currentLevel: this.state.currentLevel + 1,
@@ -516,16 +517,15 @@ class AnnotationTool extends Component {
     })
   }
 
-
-//   _makeid(length) {
-//     var result = '';
-//     var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-//     var charactersLength = characters.length;
-//     for (var i = 0; i < length; i++) {
-//        result += characters.charAt(Math.floor(Math.random() * charactersLength));
-//     }
-//     return result;
-//   }
+  _makeid(length) {
+    var result = '';
+    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for (var i = 0; i < length; i++) {
+       result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+  }
   
   onChangeAge(event) {
     console.log(this.state.data.demographics);
